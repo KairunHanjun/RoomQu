@@ -11,12 +11,12 @@
       class: extraClass = '',
       children,
       onclick: onClick,
-    }=$props<{ 
+    }=$props<{
         class?: string;
         children?: Snippet;
         onclick?: any;
     }>();
-    let mergeClass1 = twMerge ("flex group bg-slate-200 text-indigo-600 font-bold px-6 py-2.5 rounded-full border-b-8 border-indigo-400 hover:border-indigo-500 active:border-b-2 active:translate-y-1 transition-all duration-150 ease-in-out focus:outline-none focus:ring-4 focus:ring-indigo-300 " + extraClass);
+    let mergeClass1 = $derived(twMerge ("flex group bg-slate-200 text-indigo-600 font-bold px-6 py-2.5 rounded-full border-b-8 border-indigo-400 hover:border-indigo-500 active:border-b-2 active:translate-y-1 transition-all duration-150 ease-in-out focus:outline-none focus:ring-4 focus:ring-indigo-300 " + extraClass));
 </script>
 
 <button
@@ -27,7 +27,7 @@
   {@render children?.()}
 </button>
 
-<!-- 
+<!--
   Alternative Style using Box Shadow (closer to the image):
 
   If you prefer a box-shadow that moves with the button, you can use this class list instead.

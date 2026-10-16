@@ -1,12 +1,12 @@
-import { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME } from "$env/static/private";
+import { env } from "$env/dynamic/private";
 import { v2 as cloudinary, type TransformationOptions, type UploadApiErrorResponse, type UploadApiResponse } from "cloudinary";
 
 
 export async function CREATE(file: File) {
     cloudinary.config({
-        cloud_name: CLOUDINARY_CLOUD_NAME,
-        api_key: CLOUDINARY_API_KEY, // Store in .env.local
-        api_secret: CLOUDINARY_API_SECRET, // Store in .env.local
+        cloud_name: env.CLOUDINARY_CLOUD_NAME,
+        api_key: env.CLOUDINARY_API_KEY, // Store in .env.local
+        api_secret: env.CLOUDINARY_API_SECRET, // Store in .env.local
         secure: true
     });
     try{
@@ -37,9 +37,9 @@ export async function CREATE(file: File) {
 
 export async function READ(public_id: string, transformation?: TransformationOptions): Promise<string> {
     cloudinary.config({
-        cloud_name: CLOUDINARY_CLOUD_NAME,
-        api_key: CLOUDINARY_API_KEY, // Store in .env.local
-        api_secret: CLOUDINARY_API_SECRET, // Store in .env.local
+        cloud_name: env.CLOUDINARY_CLOUD_NAME,
+        api_key: env.CLOUDINARY_API_KEY, // Store in .env.local
+        api_secret: env.CLOUDINARY_API_SECRET, // Store in .env.local
         secure: true
     });
     return cloudinary.url(public_id, {
@@ -50,10 +50,11 @@ export async function READ(public_id: string, transformation?: TransformationOpt
 }
 
 export async function DELETE(public_id: string) {
+    if(env.ROOMQU_MODE !== 'live') return null;
     cloudinary.config({
-        cloud_name: CLOUDINARY_CLOUD_NAME,
-        api_key: CLOUDINARY_API_KEY, // Store in .env.local
-        api_secret: CLOUDINARY_API_SECRET, // Store in .env.local
+        cloud_name: env.CLOUDINARY_CLOUD_NAME,
+        api_key: env.CLOUDINARY_API_KEY, // Store in .env.local
+        api_secret: env.CLOUDINARY_API_SECRET, // Store in .env.local
         secure: true
     });
     try{

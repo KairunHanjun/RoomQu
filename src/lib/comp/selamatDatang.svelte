@@ -67,10 +67,10 @@
     sayText1?: string;
     text2Say?: string;
   }>();
-  extraClass = twMerge("flex-col w-fit h-fit p-4 m-2 justify-center-safe items-center-safe bg-transparent" + extraClass);
+  const mergedClass = $derived(twMerge("flex-col w-fit h-fit p-4 m-2 justify-center-safe items-center-safe bg-transparent " + extraClass));
 </script>
 
-<div class={extraClass}>
+<div class={mergedClass}>
     <p class="text-center {text1Bold ? 'font-bold' : ''} text-white" style="font-size: {text1Size};"> {sayText1} </p>
     <p class="text-center {text2Bold ? 'font-bold' : ''} text-white" style="font-size: {text2Size};"> {text2Say} </p>
 </div>
