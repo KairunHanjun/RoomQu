@@ -112,8 +112,6 @@ Local verification on 16 October 2026 recorded **52 passing HTTP integration che
 - `ROOMQU_MODE=demo` and `pnpm test:prototype` refer to the independent SQLite prototype, not original-backend verification.
 - `ROOMQU_MODE=live` selects external integrations requiring separate configuration. PWA caching is enabled only for an explicitly selected live build.
 
-Originally developed independently by **Guntur Ahmad Lion Putranto**. Codex assisted with subsequent frontend, integration, and portfolio documentation work.
-
 ## License
 
 Project code is licensed under the **Apache License 2.0**; see [LICENSE](LICENSE). Third-party dependencies and assets retain their respective licenses.
