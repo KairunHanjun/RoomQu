@@ -6,8 +6,8 @@
    * Komponen kartu yang dapat diklik untuk aksi utama (Input Masalah, Input Absensi).
    * Menerima kelas CSS untuk warna latar belakang dan slot 'children' untuk ikon.
    */
-  let { 
-    label, 
+  let {
+    label,
     class: extraClass = '',
     children,
     onclick: handleClick,
@@ -19,7 +19,7 @@
     onclick?: void | (() => void) | (() => {});
     useSVG?: boolean;
   }>();
-  let extraClass1 = twMerge("p-6 rounded-3xl text-white font-bold text-2xl flex flex-col items-center justify-center gap-4 shadow-lg hover:shadow-xl active:translate-y-0.5 transition-all duration-200 ease-in-out focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-offset-slate-900 " + extraClass);
+  let extraClass1 = $derived(twMerge("p-6 rounded-3xl text-white font-bold text-2xl flex flex-col items-center justify-center gap-4 shadow-lg hover:shadow-xl active:translate-y-0.5 transition-all duration-200 ease-in-out focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-offset-slate-900 " + extraClass));
 </script>
 
 <button

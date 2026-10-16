@@ -1,89 +1,32 @@
 import type { Handle } from '@sveltejs/kit';
-import * as auth from '$lib/server/auth';
-import { sequence } from '@sveltejs/kit/hooks';
-import { db } from '$lib/server/db';
-import { session, units } from '$lib/server/db/schema';
-import { lt, eq, sql } from 'drizzle-orm';	
-
-export const checkUnitsMiddleware: Handle = async ({ event, resolve }) => {
-	try{
-		const expiredUnits = await db.select()
-		.from(units)
-		.where(lt(units.toTime, sql`NOW()`));
-		for (const u of expiredUnits) {
-			await db.update(units)
-				.set({ unitState: 'StandBy' })
-				.where(eq(units.id, u.id));
-		}
-	}catch(error){}
-
-	return resolve(event);
+import { env } from '$env/dynamic/private';
+export const handle: Handle = async ({ event, resolve }) => {
+	event.locals.demoUser = null;
+	if (env.ROOMQU_MODE === 'demo')
+		return (await import('./hooks.demo.server')).handle({ event, resolve });
+	if (
+		['POST', 'PUT', 'PATCH', 'DELETE'].includes(event.request.method) &&
+		event.request.headers.get('origin') !== event.url.origin
+	)
+		return new Response('Origin tidak diizinkan.', { status: 403 });
+	if (
+		event.url.pathname.startsWith('/demo/') &&
+		!event.url.pathname.endsWith('.svg') &&
+		!event.url.pathname.endsWith('.ttf')
+	)
+		return new Response('Prototipe terpisah hanya tersedia dalam ROOMQU_MODE=demo.', {
+			status: 404
+		});
+	if (event.url.pathname.startsWith('/api/'))
+		return new Response('Gunakan aksi terintegrasi RoomQu.', { status: 403 });
+	await (await import('$lib/server/db')).ensureDatabase();
+	const original = await (await import('./hooks.legacy.server')).handle({ event, resolve });
+	const response = new Response(original.body, {
+		status: original.status,
+		statusText: original.statusText,
+		headers: new Headers(original.headers)
+	});
+	response.headers.set('Cache-Control', 'private, no-store');
+	response.headers.set('X-RoomQu-Backend', 'original-drizzle');
+	return response;
 };
-
-const authMiddleware: Handle = async ({event, resolve}) => {
-	const sessionToken = event.cookies.get(auth.sessionCookieName);
-	let user = null;
-	let session = null;
-	if (sessionToken) {
-		const result = await auth.validateSessionToken(sessionToken, event);
-		user = result.user;
-		session = result.session;
-
-		if (session) {
-			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt, '/');
-		} else {
-			auth.deleteSessionTokenCookie(event, '/');
-		}
-	}
-	event.locals.user = user;
-	event.locals.session = session;
-	// Path and route control
-	const pathname = event.url.pathname;
-	const publicRoutes = ['/','/offline'];
-	const isPublic = publicRoutes.some((r) => pathname === r);
-
-	// Define each accountType’s dashboard
-	const homeRoutes = {
-		FO: '/User/FO',
-		HK: '/User/HK',
-		T: '/User/T',
-		H: '/User/H'
-	} as const;
-
-	// 🧭 1. Not logged in trying to access protected route → send to landing
-	if (!user && !isPublic) {
-		console.log("Check User 1");
-		return Response.redirect(new URL('/', event.url), 302);
-	}
-
-	
-	// 🧭 2. Logged in but tries to access public routes → send to dashboard
-	if (user && isPublic) {
-		console.log("Check User 2: " + isPublic);
-		const redirectTo = homeRoutes[user.accountType as keyof typeof homeRoutes] ?? '/';
-		return Response.redirect(new URL(redirectTo, event.url), 302);
-	}
-
-	
-	// 🧭 3. Role restriction: ensure users only access their area
-	if (user) {
-		for (const [type, route] of Object.entries(homeRoutes)) {
-			// Example: FO can only access /fo/*
-			if (pathname === `/User/${type.toUpperCase()}` && user.accountType !== type) {
-				console.log("Check User 3");
-				const redirectTo = homeRoutes[user.accountType as keyof typeof homeRoutes] ?? '/';
-				return Response.redirect(new URL(redirectTo, event.url), 302);
-			}
-		}
-	}
-
-	// Continue normally
-	return await resolve(event);
-}
-
-const checkOutdatedSession: Handle = async ({event, resolve}) => {
-	await db.delete(session).where(lt(session.expiresAt, new Date()));
-	return await resolve(event);
-}
-
-export const handle: Handle = sequence(authMiddleware, checkOutdatedSession, checkUnitsMiddleware);

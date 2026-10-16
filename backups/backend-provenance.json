@@ -1,0 +1,30 @@
+{
+  "sourceCommit": "520b0eb6c812023e116ff474ad7b9f8abe20bf84",
+  "note": "SHA-256 of exported actions block, normalized to LF with trailing whitespace removed per line and outer whitespace trimmed. Implementations unchanged; imports adapted after moving modules.",
+  "handlers": {
+    "H": {
+      "source": "src/routes/User/H/+page.server.ts",
+      "module": "src/lib/server/original/host.ts",
+      "actionsSha256": "40dddcff3760d8a4cb3ac8f77497844e51e5906d0d3ed11b1d33407e22d968fe",
+      "actionsUnchanged": true
+    },
+    "FO": {
+      "source": "src/routes/User/FO/+page.server.ts",
+      "module": "src/lib/server/original/front-office.ts",
+      "actionsSha256": "86edc40b1e8b178f3b7f92d52e924395023bbbbca7f43b927716703d50293e1b",
+      "actionsUnchanged": true
+    },
+    "HK": {
+      "source": "src/routes/User/HK/+page.server.ts",
+      "module": "src/lib/server/original/housekeeping.ts",
+      "actionsSha256": "0ea2e9a4315b8a927bbab61142c5452f417a82962ce376c51217b83e001312c9",
+      "actionsUnchanged": true
+    },
+    "T": {
+      "source": "src/routes/User/T/+page.server.ts",
+      "module": "src/lib/server/original/technician.ts",
+      "actionsSha256": "8dc1370738effd7ec740d5aedc9396856757b9bd3b8497a6537b710149410dd7",
+      "actionsUnchanged": true
+    }
+  }
+}

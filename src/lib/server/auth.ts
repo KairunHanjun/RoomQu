@@ -107,6 +107,9 @@ export function setSessionTokenCookie(event: RequestEvent, token: string, expire
 	if(!event.cookies.get(sessionCookieName)){
 		event.cookies.set(sessionCookieName, token, {
 			expires: expiresAt,
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: event.url?.protocol === 'https:',
 			path: path
 		});
 	}
