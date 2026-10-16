@@ -1,72 +1,120 @@
-# RoomQu — UI baru terintegrasi dengan backend asli
+# RoomQu
 
-RoomQu awalnya dirancang untuk **mobile**. Versi ini mengintegrasikan frontend baru yang dibantu Codex dengan login, sesi, schema Drizzle/PostgreSQL, dan handler operasional asli. UI/aset mobile asli telah diarsipkan dari commit `520b0eb`; lihat [backup dan asal perubahan](backups/README.md). Tampilan dipertahankan sebagai antarmuka mobile, termasuk dalam bingkai maksimal 480 px saat dibuka di desktop. Implementasi Tauri belum dilakukan.
+**Aplikasi operasional properti dengan alur kerja yang dirancang untuk mobile.**
 
-Dokumentasi Inggris: [README.en.md](README.en.md).
+[English](README.en.md) · [Source integrasi](https://github.com/KairunHanjun/RoomQu) · [Apache 2.0](LICENSE)
 
-## Menjalankan demo lokal
+RoomQu menghubungkan pekerjaan **Host, Front Office, House Keeping, dan Teknisi**: mengelola unit, menerima tamu, mendokumentasikan kebersihan, dan menangani masalah. Proyek ini mengeksplorasi bagaimana status unit dan tanggung jawab tiap peran dapat terhubung dalam satu aplikasi.
 
-Memerlukan Node.js 24+ dan pnpm. Dari folder RoomQu:
+Antarmuka tetap berorientasi mobile, termasuk bingkai maksimal 480 px pada desktop. **Tauri masih rencana pengembangan**, bukan fitur yang sudah tersedia.
+
+## Sekilas aplikasi
+
+<p>
+  <img src="docs/screenshots/01-mobile-front-office.jpg" width="230" alt="Dashboard Front Office dengan data dummy" />
+  <img src="docs/screenshots/02-mobile-hourly-checkin.jpg" width="230" alt="Form check-in per jam dengan data dummy" />
+  <img src="docs/screenshots/03-mobile-occupied-units.jpg" width="230" alt="Status unit terisi setelah pemesanan disimpan" />
+</p>
+
+Screenshot berasal dari aplikasi berjalan dengan data fiktif. Galeri: [dokumentasi mobile](docs/screenshots/README.md).
+
+## Fitur utama
+
+| Peran | Alur kerja |
+| --- | --- |
+| Host | Memantau operasional, mengelola staf/unit/agen, dan menyetujui dokumentasi kebersihan. |
+| Front Office | Check-in harian atau per jam, check-out, dan pemantauan status unit. |
+| House Keeping | Absensi dan pengiriman dokumentasi kebersihan. |
+| Teknisi | Absensi, laporan masalah, dan penyelesaian perawatan unit. |
+
+Login memakai Argon2 dan sesi asli. Fitur lain mencakup gambar dokumentasi lokal, pembatasan akses berdasarkan properti, dan ekspor Excel. Harga serta nominal komisi dimasukkan per pemesanan sesuai model data asli.
+
+## Teknologi
+
+TypeScript, Svelte 5, SvelteKit 2, Tailwind CSS, Drizzle ORM, schema PostgreSQL, PGlite, Argon2, dan ExcelJS. Demo menggunakan **database PGlite berbasis file** tanpa PostgreSQL server atau Cloudinary eksternal.
+
+## Menjalankan demo
+
+Memerlukan **Node.js 24+** dan **pnpm**. Versi integrasi sudah tersedia pada cabang `main`:
+
+```sh
+git clone https://github.com/KairunHanjun/RoomQu.git
+cd RoomQu
+pnpm install --frozen-lockfile
+pnpm dev:demo
+```
+
+Pada Windows, launcher juga tersedia:
 
 ```powershell
-pnpm install --frozen-lockfile
 .\start-demo.ps1
+# Port alternatif:
+.\start-demo.ps1 -Port 1232
 ```
 
-Buka http://127.0.0.1:1231. Launcher memakai `ROOMQU_MODE=integrated`. Bila dependensi sudah terpasang, cukup jalankan launcher. Port lain: `.\start-demo.ps1 -Port 1232`. Alternatif: `pnpm dev:demo` tanpa environment mode lain.
+Buka **http://127.0.0.1:1231** dan hentikan dengan `Ctrl+C`. Gunakan mode integrasi bawaan; jangan mengatur `ROOMQU_MODE=demo` bila ingin menjalankan frontend yang terhubung ke backend asli.
 
-| Peran | Username | Kata sandi |
+| Peran | Username | Kata sandi demo |
 | --- | --- | --- |
-| Host | host.demo | DemoRoom123! |
-| Front Office | front.demo | DemoRoom123! |
-| House Keeping | clean.demo | DemoRoom123! |
-| Teknisi | tech.demo | DemoRoom123! |
+| Host | `host.demo` | `DemoRoom123!` |
+| Front Office | `front.demo` | `DemoRoom123!` |
+| House Keeping | `clean.demo` | `DemoRoom123!` |
+| Teknisi | `tech.demo` | `DemoRoom123!` |
 
-Semua akun, tamu, dan nominal bersifat dummy. Tidak perlu PostgreSQL server atau Cloudinary. Database lokal berbasis file menggunakan **[PGlite](https://pglite.dev/docs/filesystems)**, dengan SQL yang dihasilkan dari **schema asli**, bukan tabel SQLite prototipe. Data tetap ada sesudah restart; gunakan hanya satu proses server untuk direktori database yang sama.
+Seluruh akun, tamu, gambar contoh, dan nominal bersifat dummy. Tidak ada dokumen identitas atau pembayaran nyata.
 
-## Hubungan frontend dan backend
+## Cara integrasi bekerja
 
 ```text
-UI baru pada / dan /User/H, /User/FO, /User/HK, /User/T
-  -> adapter form ?/integrated (validasi peran, properti, dan input)
-  -> handler asli di src/lib/server/original
-  -> Drizzle dengan schema asli di src/lib/server/db/schema.ts
-  -> PGlite file lokal untuk demo
+UI mobile: / dan /User/H, /User/FO, /User/HK, /User/T
+  -> adapter form ?/integrated
+  -> handler bisnis asli: src/lib/server/original
+  -> schema Drizzle asli: src/lib/server/db/schema.ts
+  -> database PGlite file untuk demo lokal
 ```
 
-Login tetap memverifikasi Argon2 dan membuat sesi `auth-session`. Check-in memakai aksi `costumer`; check-out memakai `editcostumer`; kebersihan memakai `keep`/`approve`; perbaikan memakai `repairman`; absensi memakai `absen`; tambah staf, unit, dan agen memakai aksi Host asli. Adapter data membaca tabel `accounts`, `session`, `units`, `agents`, `customers`, `kebersihan`, `masalah`, dan `absen` yang sama.
+Adapter memvalidasi peran, properti, dan input sebelum memanggil handler asli. Frontend tidak menambahkan kolom yang tidak ada pada schema, seperti komisi persentase agen atau tarif tetap unit. Durasi per jam mengikuti kontrak asli: **1–23 jam**.
 
-Tarif dan **nominal komisi diisi per pemesanan**, sesuai model asli. Tidak ditambahkan kolom tarif unit, tipe unit, komisi persentase agen, nama lengkap staf, atau status nonaktif yang tidak tersedia pada schema asli. UI menyembunyikan kontrol prototipe untuk fitur-fitur tersebut. Durasi mendukung hari dan 1–23 jam melalui kontrak handler asli. Persetujuan kebersihan menghapus dokumentasi sebagaimana handler asli; perbaikan berat mengembalikan unit menjadi Ready sesuai perilaku asli.
-
-Gambar opsional tersimpan lokal, maksimal 2 MB (PNG/JPEG/WebP), dan hanya dapat diakses akun dalam properti yang sama. Tanpa unggahan, digunakan ilustrasi berlabel demo. Tidak ada KTP atau pembayaran nyata. Endpoint API lama dibatasi agar tidak melewati adapter; ini integrasi alur yang didukung UI baru, bukan pernyataan bahwa seluruh fitur UI lama telah direplikasi.
+Source UI mobile awal dari commit `520b0eb` disimpan pada [backup](backups/README.md). Frontend terbaru dan adapter merupakan penyempurnaan yang dibantu Codex atas persetujuan pemilik; tampilannya tidak diklaim sebagai UI awal yang tidak berubah.
 
 ## Penyimpanan dan reset
 
-Default: `.demo/original-postgres` untuk database; `.demo/original-media` untuk gambar. Lokasi dapat ditentukan lewat `ROOMQU_PG_DIR` dan `ROOMQU_MEDIA_DIR`. Folder `.demo` tidak di-commit.
+| Data | Lokasi bawaan | Override |
+| --- | --- | --- |
+| Database | `.demo/original-postgres` | `ROOMQU_PG_DIR` |
+| Gambar | `.demo/original-media` | `ROOMQU_MEDIA_DIR` |
 
-Hentikan server sebelum reset:
+Data bertahan setelah restart. Jalankan hanya satu server untuk satu direktori database. Unggahan PNG/JPEG/WebP dibatasi 2 MB dan hanya dapat diakses akun dalam properti terkait.
 
-```powershell
+Untuk mengembalikan data demo, **hentikan server terlebih dahulu**:
+
+```sh
 pnpm demo:reset
-.\start-demo.ps1
+pnpm dev:demo
 ```
 
-Reset mengembalikan akun dan data operasional dummy, termasuk sesi. Berkas gambar lokal dipertahankan. Jangan menjalankan reset saat server masih memakai database itu.
+Reset mengembalikan akun, sesi, dan data operasional dummy. Gambar yang sudah tersimpan tetap dipertahankan.
 
-## Verifikasi
+## Pemeriksaan dan build
 
-```powershell
+```sh
 pnpm test:integrated
 pnpm check
 pnpm build
 ```
 
-Tes integrasi menjalankan server sendiri pada port 1251 dan database file baru yang terisolasi, lalu menguji login asli, role/properti, tamu harian/jam, kebersihan, perawatan, absensi, staf/agen/unit, gambar lokal, dan ekspor. Folder tes berada di `.demo/integration-test-*` dan tidak di-push. [Laporan pemeriksaan](docs/integration-verification.md).
+Verifikasi lokal pada 16 Oktober 2026 mencatat **52 pemeriksaan integrasi HTTP lulus**, pemeriksaan Svelte tanpa error/warning, dan build berhasil. Tes memakai server sendiri pada port 1251 dan database terisolasi. Detail cakupan dan batas: [laporan integrasi](docs/integration-verification.md).
 
-## Prototipe sebelumnya dan batas
+## Batas pengembangan
 
-`ROOMQU_MODE=demo` hanya untuk prototipe SQLite terpisah di `/demo`. `pnpm test:prototype` menguji prototipe itu; hasilnya **bukan** bukti pengujian backend asli. `pnpm prototype:reset` mereset SQLite tersebut. Screenshot portofolio lama dari `/demo` bukan bukti integrasi baru.
+- PostgreSQL/Cloudinary eksternal, deployment produksi, dan packaging Tauri belum diverifikasi.
+- Persetujuan kebersihan menghapus dokumentasi; penyelesaian perawatan berat mengembalikan unit menjadi Ready, mengikuti handler asli.
+- Belum seluruh fitur UI awal direplikasi pada frontend terbaru.
+- `ROOMQU_MODE=demo` dan `pnpm test:prototype` hanya untuk prototipe SQLite terpisah; hasilnya tidak mewakili integrasi backend asli.
+- `ROOMQU_MODE=live` memilih integrasi eksternal yang membutuhkan konfigurasi tersendiri. PWA caching hanya aktif bila mode live dipilih saat build.
 
-Konfigurasi PostgreSQL/Cloudinary eksternal tetap tersedia lewat `ROOMQU_MODE=live`, tetapi belum diverifikasi untuk produksi. Tidak ada deployment publik atau build Tauri dalam perubahan ini. PWA caching hanya aktif bila dipilih secara eksplisit melalui mode live saat build. Dependensi yang diverifikasi mengikuti `pnpm-lock.yaml`; npm ci belum diuji.
+Proyek awal dikembangkan mandiri oleh **Guntur Ahmad Lion Putranto**. Penyempurnaan frontend, integrasi, dan dokumentasi portofolio dibantu Codex.
 
-Kontribusi pemilik pada proyek awal dikonfirmasi 100%. Frontend dan integrasi dalam perubahan ini merupakan pengembangan lanjutan **dengan bantuan Codex**, bukan UI mobile asli yang tidak berubah.
+## Lisensi
+
+Kode proyek dilisensikan dengan **Apache License 2.0**; lihat [LICENSE](LICENSE). Dependensi dan aset pihak ketiga tetap mengikuti lisensinya masing-masing.
