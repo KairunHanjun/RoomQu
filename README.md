@@ -113,8 +113,6 @@ Verifikasi lokal pada 16 Oktober 2026 mencatat **52 pemeriksaan integrasi HTTP l
 - `ROOMQU_MODE=demo` dan `pnpm test:prototype` hanya untuk prototipe SQLite terpisah; hasilnya tidak mewakili integrasi backend asli.
 - `ROOMQU_MODE=live` memilih integrasi eksternal yang membutuhkan konfigurasi tersendiri. PWA caching hanya aktif bila mode live dipilih saat build.
 
-Proyek awal dikembangkan mandiri oleh **Guntur Ahmad Lion Putranto**. Penyempurnaan frontend, integrasi, dan dokumentasi portofolio dibantu Codex.
-
 ## Lisensi
 
 Kode proyek dilisensikan dengan **Apache License 2.0**; lihat [LICENSE](LICENSE). Dependensi dan aset pihak ketiga tetap mengikuti lisensinya masing-masing.
