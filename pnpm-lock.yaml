@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@electric-sql/pglite':
-        specifier: 0.5.10
-        version: 0.5.10
+        specifier: 0.5.15
+        version: 0.5.15
       '@types/bcrypt':
         specifier: ^6.0.0
         version: 6.0.0
@@ -95,7 +95,7 @@ importers:
         version: 0.31.11
       drizzle-orm:
         specifier: ^0.44.5
-        version: 0.44.7(@electric-sql/pglite@0.5.10)(postgres@3.4.9)
+        version: 0.44.7(@electric-sql/pglite@0.5.15)(postgres@3.4.9)
       eslint:
         specifier: ^9.36.0
         version: 9.39.5(jiti@2.7.0)(supports-color@7.2.0)
@@ -672,8 +672,8 @@ packages:
   '@drizzle-team/brocli@0.10.2':
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
 
-  '@electric-sql/pglite@0.5.10':
-    resolution: {integrity: sha512-tXc/25U3ulOkiRQuTFdwIv+JhBqtMdAF7Gvo6CfZZWtSB4+hgC4Wr2vwK5ngvvN5PJfAAEGIsfyCVy1JhCOBYw==}
+  '@electric-sql/pglite@0.5.15':
+    resolution: {integrity: sha512-ERZWgaRTxueGV4cvL1tfpAOzFCWTXoUtbCBqnf2FhHDVs/so9eAKaanvrwWF9Dntx7BYsmFQujVQ0/B4S8Mmiw==}
 
   '@emnapi/runtime@1.11.3':
     resolution: {integrity: sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA==}
@@ -4593,7 +4593,7 @@ snapshots:
 
   '@drizzle-team/brocli@0.10.2': {}
 
-  '@electric-sql/pglite@0.5.10': {}
+  '@electric-sql/pglite@0.5.15': {}
 
   '@emnapi/runtime@1.11.3':
     dependencies:
@@ -5864,9 +5864,9 @@ snapshots:
       esbuild: 0.25.12
       tsx: 4.23.15
 
-  drizzle-orm@0.44.7(@electric-sql/pglite@0.5.10)(postgres@3.4.9):
+  drizzle-orm@0.44.7(@electric-sql/pglite@0.5.15)(postgres@3.4.9):
     optionalDependencies:
-      '@electric-sql/pglite': 0.5.10
+      '@electric-sql/pglite': 0.5.15
       postgres: 3.4.9
 
   dunder-proto@1.0.1:
