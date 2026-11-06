@@ -116,3 +116,7 @@ Verifikasi lokal pada 16 Oktober 2026 mencatat **52 pemeriksaan integrasi HTTP l
 ## Lisensi
 
 Kode proyek dilisensikan dengan **Apache License 2.0**; lihat [LICENSE](LICENSE). Dependensi dan aset pihak ketiga tetap mengikuti lisensinya masing-masing.
+
+## Hosting demo VPS
+
+Branch `demo` menggunakan data dummy. Panduan runtime permanen, build, dan reset: [deploy/README.md](deploy/README.md).
